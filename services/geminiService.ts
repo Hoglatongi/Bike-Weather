@@ -33,8 +33,9 @@ const weatherSchema = {
                 windSpeed: { type: Type.NUMBER, description: "Wind speed in miles per hour." },
                 uvIndex: { type: Type.NUMBER, description: "UV index, integer from 0 to 11+." },
                 rainProbability: { type: Type.NUMBER, description: "Probability of rain as a percentage from 0 to 100." },
+                temperature: { type: Type.NUMBER, description: "Temperature in Fahrenheit." },
               },
-              required: ['time', 'windSpeed', 'uvIndex', 'rainProbability'],
+              required: ['time', 'windSpeed', 'uvIndex', 'rainProbability', 'temperature'],
             },
           },
         },
@@ -57,25 +58,25 @@ export const fetchWeatherForecast = async (input: ForecastInput): Promise<Weathe
 
   let prompt: string;
 
+  const commonPrompt = `
+    For each of the next 5 days, provide an hourly forecast for daytime hours only, specifically from 7 AM to 7 PM (19:00).
+    The data for each hour should include:
+    1. Wind speed in miles per hour.
+    2. UV index as an integer.
+    3. Precipitation probability as a percentage.
+    4. Temperature in Fahrenheit.
+    Return the city and country name for the location.
+  `;
+
   if ('lat' in input && 'lon' in input) {
     prompt = `
       Based on the latitude ${input.lat} and longitude ${input.lon}, provide a 5-day weather forecast suitable for biking, starting from today which is ${formattedDate}.
-      For each of the next 5 days, provide an hourly forecast for daytime hours only, specifically from 7 AM to 7 PM (19:00).
-      The data for each hour should include:
-      1. Wind speed in miles per hour.
-      2. UV index as an integer.
-      3. Precipitation probability as a percentage.
-      Return the city and country name for the location.
+      ${commonPrompt}
     `;
   } else {
      prompt = `
       Based on the location "${input.location}", provide a 5-day weather forecast suitable for biking, starting from today which is ${formattedDate}.
-      For each of the next 5 days, provide an hourly forecast for daytime hours only, specifically from 7 AM to 7 PM (19:00).
-      The data for each hour should include:
-      1. Wind speed in miles per hour.
-      2. UV index as an integer.
-      3. Precipitation probability as a percentage.
-      Return the city and country name for the location.
+      ${commonPrompt}
     `;
   }
 

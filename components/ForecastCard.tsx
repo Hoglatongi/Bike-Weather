@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { DailyForecast } from '../types';
 import WeatherChart from './WeatherChart';
-import { WindIcon, SunIcon, RainIcon, RainDropIcon } from './icons';
+import { WindIcon, SunIcon, RainIcon, RainDropIcon, TemperatureIcon } from './icons';
 
 interface ForecastCardProps {
   day: DailyForecast;
@@ -20,6 +20,8 @@ const ForecastCard: React.FC<ForecastCardProps> = ({ day }) => {
   const avgWind = day.hourlyData.reduce((acc, cur) => acc + cur.windSpeed, 0) / day.hourlyData.length;
   const maxUv = Math.max(...day.hourlyData.map(h => h.uvIndex));
   const maxRain = Math.max(...day.hourlyData.map(h => h.rainProbability));
+  const avgTemp = day.hourlyData.reduce((acc, cur) => acc + cur.temperature, 0) / day.hourlyData.length;
+
 
   return (
     <div className="bg-slate-800/50 rounded-lg shadow-lg overflow-hidden transition-all duration-300 ease-in-out mb-4">
@@ -34,6 +36,9 @@ const ForecastCard: React.FC<ForecastCardProps> = ({ day }) => {
             <p className="text-sm text-slate-400">{formattedDate}</p>
           </div>
           <div className="flex items-center space-x-4 text-slate-300">
+             <div className="flex items-center space-x-1" title={`Average Temperature: ${avgTemp.toFixed(0)}°F`}>
+                <TemperatureIcon className="w-5 h-5 text-orange-400" /> <span>{avgTemp.toFixed(0)}°F</span>
+             </div>
              <div className="flex items-center space-x-1" title={`Average Wind: ${avgWind.toFixed(0)} mph`}>
                 <WindIcon className="w-5 h-5" /> <span>{avgWind.toFixed(0)} mph</span>
              </div>
@@ -59,7 +64,13 @@ const ForecastCard: React.FC<ForecastCardProps> = ({ day }) => {
 
       {isOpen && (
         <div className="p-4 border-t border-slate-700">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h3 className="flex items-center text-lg font-semibold mb-2 text-orange-400">
+                        <TemperatureIcon className="w-5 h-5 mr-2" /> Temperature (°F)
+                    </h3>
+                    <WeatherChart data={day.hourlyData} dataKey="temperature" strokeColor="#fb923c" unit="°F" />
+                </div>
                 <div>
                     <h3 className="flex items-center text-lg font-semibold mb-2 text-sky-300">
                         <WindIcon className="w-5 h-5 mr-2" /> Wind Speed (mph)

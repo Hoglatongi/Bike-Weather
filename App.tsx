@@ -11,6 +11,35 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [locationInput, setLocationInput] = useState('');
+  
+  const [backgroundImage, setBackgroundImage] = useState<string | null>(() => {
+    return localStorage.getItem('userBackgroundImage');
+  });
+
+  const handleBackgroundImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const result = e.target?.result as string;
+            setBackgroundImage(result);
+            try {
+                localStorage.setItem('userBackgroundImage', result);
+            } catch (storageError) {
+                console.error("Could not save image to local storage:", storageError);
+                setError("Your image is too large to be saved for next time, but it will be used for this session.");
+            }
+        };
+        reader.readAsDataURL(file);
+    } else if (file) {
+        setError("Please select a valid image file.");
+    }
+  };
+
+  const resetBackgroundImage = () => {
+      setBackgroundImage(null);
+      localStorage.removeItem('userBackgroundImage');
+  };
 
   const handleGetForecastByGeolocation = useCallback(() => {
     setError(null);
@@ -75,25 +104,44 @@ const App: React.FC = () => {
     }
   }, [locationInput]);
 
+  const defaultImageUrl = 'https://images.unsplash.com/photo-1511994293814-3a0a1f05561a?q=80&w=2940&auto=format&fit=crop';
+  const imageUrl = backgroundImage || defaultImageUrl;
+
+  const backgroundStyle = {
+    backgroundImage: `
+      linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85)),
+      url("${imageUrl}")
+    `,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundAttachment: 'fixed',
+  };
+
+  const cardClasses = "bg-slate-900/40 backdrop-blur-sm p-8 md:p-12 rounded-2xl shadow-2xl border border-slate-700/50";
+
 
   const renderContent = () => {
     if (isLoading) {
-      return <Loader message="Fetching your bike-friendly forecast..." />;
+      return (
+        <div className={cardClasses}>
+          <Loader message="Fetching your bike-friendly forecast..." />
+        </div>
+      );
     }
 
     if (error) {
       return (
-        <>
+        <div className={cardClasses}>
           <ErrorDisplay message={error} />
           <div className="text-center mt-4">
               <button
-                  onClick={() => { setError(null); setWeatherData(null); }}
+                  onClick={() => { setError(null); }}
                   className="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-full transition-colors"
               >
-                  Try again
+                  Dismiss
               </button>
           </div>
-        </>
+        </div>
       );
     }
 
@@ -112,7 +160,7 @@ const App: React.FC = () => {
     }
     
     return (
-        <div className="text-center">
+        <div className={`text-center ${cardClasses}`}>
             <h1 className="text-4xl md:text-5xl font-bold mb-4">Jens Bike Weather</h1>
             <p className="text-lg text-slate-300 max-w-2xl mx-auto mb-8">
                 Get daytime weather conditions perfect for your ride. We'll show you the wind, sun, and chance of rain with easy-to-read graphs.
@@ -160,7 +208,10 @@ const App: React.FC = () => {
 
 
   return (
-    <div className="min-h-screen bg-slate-900 flex flex-col items-center p-4 sm:p-6 lg:p-8 font-sans">
+    <div 
+      className="min-h-screen flex flex-col items-center p-4 sm:p-6 lg:p-8 font-sans"
+      style={backgroundStyle}
+    >
         <main className="flex-grow flex items-center justify-center w-full">
             <div className="w-full max-w-4xl mx-auto">
                 {renderContent()}
@@ -170,6 +221,36 @@ const App: React.FC = () => {
             <p className="text-sm text-slate-500">
                 Powered by the <a href="https://ai.google.dev/gemini-api" target="_blank" rel="noopener noreferrer" className="underline hover:text-slate-400 transition-colors">Google Gemini API</a>
             </p>
+            <div className="mt-2 flex justify-center items-center gap-4 text-sm text-slate-500">
+                <input
+                    type="file"
+                    id="bg-upload"
+                    accept="image/*"
+                    onChange={handleBackgroundImageUpload}
+                    className="hidden"
+                    aria-hidden="true"
+                />
+                <label
+                    htmlFor="bg-upload"
+                    className="cursor-pointer underline hover:text-slate-400 transition-colors"
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') e.currentTarget.click(); }}
+                >
+                    Change Background
+                </label>
+                {backgroundImage && (
+                    <>
+                        <span aria-hidden="true">|</span>
+                        <button
+                            onClick={resetBackgroundImage}
+                            className="underline hover:text-slate-400 transition-colors"
+                        >
+                            Reset Background
+                        </button>
+                    </>
+                )}
+            </div>
         </footer>
     </div>
   );

@@ -55,3 +55,11 @@ export const SearchIcon: React.FC<{ className?: string }> = ({ className }) => (
         <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
     </svg>
 );
+
+export const TemperatureIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" transform="scale(0.8) translate(3, 3)"/>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75V5.25m0 13.5a2.25 2.25 0 01-2.25-2.25V7.5a2.25 2.25 0 014.5 0v9a2.25 2.25 0 01-2.25 2.25z" />
+    <path d="M7.5 12h-1.5m12 0h-1.5m-6-3.75h-1.5m6 0h-1.5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);

@@ -4,6 +4,7 @@ export interface HourlyData {
   windSpeed: number; // mph
   uvIndex: number; // 0-11+
   rainProbability: number; // 0-100
+  temperature: number; // °F
 }
 
 export interface DailyForecast {
