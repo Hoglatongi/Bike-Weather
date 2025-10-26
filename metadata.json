@@ -1,5 +1,5 @@
 {
-  "name": "Jens Bike Weather",
+  "name": "JM's Bike Weather Forecast",
   "description": "A weather application that provides a five-day forecast tailored for cyclists, showing daytime conditions for wind, sun, and rain with helpful graphs.",
   "requestFramePermissions": [
     "geolocation"

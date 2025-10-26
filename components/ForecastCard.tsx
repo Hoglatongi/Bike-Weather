@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { DailyForecast } from '../types';
 import WeatherChart from './WeatherChart';
-import { WindIcon, SunIcon, RainIcon, RainDropIcon, TemperatureIcon } from './icons';
+import { WindIcon, SunIcon, RainIcon, RainDropIcon, TemperatureIcon, BikeIcon } from './icons';
 
 interface ForecastCardProps {
   day: DailyForecast;
@@ -14,8 +14,8 @@ const ForecastCard: React.FC<ForecastCardProps> = ({ day }) => {
   // Adjust for timezone to avoid off-by-one day errors
   date.setMinutes(date.getMinutes() + date.getTimezoneOffset());
   
-  const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'long' });
-  const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const dayOfWeek = date.toLocaleString('en-US', { weekday: 'long' });
+  const formattedDate = date.toLocaleString('en-US', { month: 'short', day: 'numeric' });
 
   const avgWind = day.hourlyData.reduce((acc, cur) => acc + cur.windSpeed, 0) / day.hourlyData.length;
   const maxUv = Math.max(...day.hourlyData.map(h => h.uvIndex));
@@ -27,15 +27,21 @@ const ForecastCard: React.FC<ForecastCardProps> = ({ day }) => {
     <div className="bg-slate-800/50 rounded-lg shadow-lg overflow-hidden transition-all duration-300 ease-in-out mb-4">
       <button 
         onClick={() => setIsOpen(!isOpen)} 
-        className="w-full text-left p-4 focus:outline-none focus:bg-slate-700/50 transition-colors"
+        className="w-full text-center sm:text-left p-4 focus:outline-none focus:bg-slate-700/50 transition-colors"
         aria-expanded={isOpen}
       >
-        <div className="flex justify-between items-center">
-          <div>
+        <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start">
+          <div className="sm:pr-4">
             <p className="text-xl font-bold text-white">{dayOfWeek}</p>
             <p className="text-sm text-slate-400">{formattedDate}</p>
+            {day.bikeAdvisory && (
+                <div className="flex items-start mt-2 text-slate-300 max-w-sm text-left">
+                    <BikeIcon className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0 text-cyan-400"/>
+                    <p className="text-sm">{day.bikeAdvisory}</p>
+                </div>
+            )}
           </div>
-          <div className="flex items-center space-x-4 text-slate-300">
+          <div className="flex items-center space-x-4 text-slate-300 flex-shrink-0 mt-4 sm:mt-0">
              <div className="flex items-center space-x-1" title={`Average Temperature: ${avgTemp.toFixed(0)}°F`}>
                 <TemperatureIcon className="w-5 h-5 text-orange-400" /> <span>{avgTemp.toFixed(0)}°F</span>
              </div>

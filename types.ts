@@ -10,6 +10,7 @@ export interface HourlyData {
 export interface DailyForecast {
   date: string; // "YYYY-MM-DD"
   hourlyData: HourlyData[];
+  bikeAdvisory: string;
 }
 
 export interface WeatherData {
@@ -18,4 +19,12 @@ export interface WeatherData {
     country: string;
   };
   dailyForecasts: DailyForecast[];
+}
+
+export type ForecastInput = { lat: number; lon: number } | { location: string };
+
+export interface BikeTrail {
+  name: string;
+  description: string;
+  mapsUri?: string;
 }
