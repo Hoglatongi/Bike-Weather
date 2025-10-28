@@ -2,6 +2,7 @@
 export interface HourlyData {
   time: string; // "HH:00"
   windSpeed: number; // mph
+  windDirection: string; // N, NE, S, SW etc.
   uvIndex: number; // 0-11+
   rainProbability: number; // 0-100
   temperature: number; // °F

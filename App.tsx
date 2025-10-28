@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useEffect } from 'react';
 import { fetchWeatherForecast, fetchBikeTrails } from './services/geminiService';
 import { WeatherData, ForecastInput, BikeTrail } from './types';
@@ -49,6 +48,19 @@ const App: React.FC = () => {
   const [backgroundImage, setBackgroundImage] = useState<string | null>(() => {
     return localStorage.getItem('userBackgroundImage');
   });
+
+  const [backgroundOpacity, setBackgroundOpacity] = useState<number>(() => {
+    const savedOpacity = localStorage.getItem('backgroundOpacity');
+    return savedOpacity ? parseFloat(savedOpacity) : 0.85;
+  });
+
+  const [tempUnit, setTempUnit] = useState<'F' | 'C'>(() => (localStorage.getItem('jens-bike-temp-unit') as 'F' | 'C') || 'F');
+
+  const handleTempUnitToggle = () => {
+    const newUnit = tempUnit === 'F' ? 'C' : 'F';
+    setTempUnit(newUnit);
+    localStorage.setItem('jens-bike-temp-unit', newUnit);
+  };
 
   const fetchForecast = useCallback(async (
     fetcher: () => ForecastInput, 
@@ -206,11 +218,17 @@ const App: React.FC = () => {
     }
   }, []);
 
+  const handleOpacityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newOpacity = parseFloat(event.target.value);
+    setBackgroundOpacity(newOpacity);
+    localStorage.setItem('backgroundOpacity', String(newOpacity));
+  };
+
   const defaultImageUrl = 'https://images.unsplash.com/photo-1511994293814-3a0a1f05561a?q=80&w=2940&auto=format&fit=crop';
   const imageUrl = backgroundImage || defaultImageUrl;
 
   const backgroundStyle = {
-    backgroundImage: `linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85)), url("${imageUrl}")`,
+    backgroundImage: `linear-gradient(rgba(15, 23, 42, ${backgroundOpacity}), rgba(15, 23, 42, ${backgroundOpacity})), url("${imageUrl}")`,
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     backgroundAttachment: 'fixed',
@@ -232,6 +250,13 @@ const App: React.FC = () => {
                     }
                 }} className="text-cyan-400 hover:text-cyan-300 transition-colors mb-4 text-sm font-semibold">Switch to Find Bike Trails &rarr;</button>
                 <h2 className="text-3xl font-bold mb-2">{weatherData.location.city}</h2>
+                 <div className="flex justify-center items-center gap-2 mb-2">
+                    <button onClick={tempUnit === 'C' ? handleTempUnitToggle : undefined} className={`text-sm font-semibold transition-colors ${tempUnit === 'F' ? 'text-white' : 'text-slate-400 hover:text-slate-200'}`} aria-pressed={tempUnit === 'F'}>°F</button>
+                    <button onClick={handleTempUnitToggle} className="relative inline-flex items-center h-6 rounded-full w-11 bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-cyan-500" aria-label={`Switch to ${tempUnit === 'F' ? 'Celsius' : 'Fahrenheit'}`}>
+                        <span className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${tempUnit === 'F' ? 'translate-x-1' : 'translate-x-6'}`} />
+                    </button>
+                    <button onClick={tempUnit === 'F' ? handleTempUnitToggle : undefined} className={`text-sm font-semibold transition-colors ${tempUnit === 'C' ? 'text-white' : 'text-slate-400 hover:text-slate-200'}`} aria-pressed={tempUnit === 'C'}>°C</button>
+                </div>
                 <p className="text-center text-slate-400 mb-4">{weatherData.location.country} - 5 Day Forecast</p>
                 {searchQuery && <p className="text-xs text-slate-500 mb-4 -mt-2">(Results for: "{searchQuery}")</p>}
                 {savedLocation && (
@@ -241,7 +266,7 @@ const App: React.FC = () => {
                     </div>
                 )}
             </div>
-            {weatherData.dailyForecasts.map((day, index) => <ForecastCard key={index} day={day} />)}
+            {weatherData.dailyForecasts.map((day, index) => <ForecastCard key={index} day={day} tempUnit={tempUnit} />)}
         </div>
       );
     }
@@ -328,6 +353,20 @@ const App: React.FC = () => {
                     <span aria-hidden="true">|</span>
                     <button onClick={resetBackgroundImage} className="underline hover:text-slate-400 transition-colors">Reset Background</button>
                 </>)}
+            </div>
+            <div className="mt-4 max-w-xs mx-auto">
+                <label htmlFor="opacity-slider" className="block text-xs text-slate-400 mb-2">Background Visibility</label>
+                <input
+                    id="opacity-slider"
+                    type="range"
+                    min="0.1"
+                    max="1"
+                    step="0.05"
+                    value={backgroundOpacity}
+                    onChange={handleOpacityChange}
+                    className="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-cyan-500"
+                    aria-label="Background visibility control"
+                />
             </div>
         </footer>
     </div>

@@ -33,11 +33,12 @@ const weatherSchema = {
               properties: {
                 time: { type: Type.STRING, description: "Time in HH:00 format (24-hour)." },
                 windSpeed: { type: Type.NUMBER, description: "Wind speed in miles per hour." },
+                windDirection: { type: Type.STRING, description: "Wind direction as a cardinal direction (e.g., N, NE, S, SW)." },
                 uvIndex: { type: Type.NUMBER, description: "UV index, integer from 0 to 11+." },
                 rainProbability: { type: Type.NUMBER, description: "Probability of rain as a percentage from 0 to 100." },
                 temperature: { type: Type.NUMBER, description: "Temperature in Fahrenheit." },
               },
-              required: ['time', 'windSpeed', 'uvIndex', 'rainProbability', 'temperature'],
+              required: ['time', 'windSpeed', 'windDirection', 'uvIndex', 'rainProbability', 'temperature'],
             },
           },
         },
@@ -62,9 +63,10 @@ export const fetchWeatherForecast = async (input: ForecastInput): Promise<Weathe
     For each of the next 5 days, provide an hourly forecast for daytime hours only, specifically from 7 AM to 7 PM (19:00).
     The data for each hour should include:
     1. Wind speed in miles per hour.
-    2. UV index as an integer.
-    3. Precipitation probability as a percentage.
-    4. Temperature in Fahrenheit.
+    2. Wind direction as a cardinal direction (e.g., N, NE, S, SW).
+    3. UV index as an integer.
+    4. Precipitation probability as a percentage.
+    5. Temperature in Fahrenheit.
     Also provide a 'bikeAdvisory' for each day: a brief, friendly summary for cyclists based on the overall conditions (e.g., "Great day for a ride, winds will be low.", "Morning ride is best to avoid afternoon rain.", or "High winds and rain likely, consider indoor training.").
     Return the city and country name for the location.
   `;
